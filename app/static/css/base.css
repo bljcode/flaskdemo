@@ -1,0 +1,11 @@
+/*test if work :http://127.0.0.1:5000/static/css/base.css*/
+.text-middle {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+@-moz-document url-prefix() {
+    fieldset { display: table-cell; }
+}
+
+input, select, textarea{border-radius:4px;border:1px solid #cccccc;}
