@@ -1,6 +1,7 @@
 from flask import Flask,render_template
 from flask_bootstrap import Bootstrap
 from config import config
+import os
 
 bootstrap = Bootstrap()
 
@@ -15,3 +16,5 @@ def create_app(config_name):
     bootstrap.init_app(app)
 
     return app
+
+app = create_app(os.getenv('STRATEGY_CONFIG') or 'default')
