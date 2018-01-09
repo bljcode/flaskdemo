@@ -1,3 +1,6 @@
 #dependency
 flask-script
 flask-bootstrap
+flask-Nav 0.6
+pymysql 0.8.0
+flask-sqlalchemy 2.3.2
