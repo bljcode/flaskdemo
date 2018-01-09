@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-solid box-default ">
+            <div class="box-header with-border">
+                <h3 class="box-title">信息表</h3>
+            </div>
+
+            <div class="box-body">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr class="header">
+                        <th>序号</th>
+                        <th>编码</th>
+                        <th>参数</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for arg in args %}
+                    <tr class="ui-state-default">
+                        <td>{{arg}}</td>
+                        <td>{{arg}}</td>
+                        <td>{{arg}}</td>
+                        <td>
+                            <button type="button" class="btn btn-xs btn-warning" onclick="{{arg}}">执行</button>
+                            <button type="button" class="btn btn-xs btn-warning" onclick="">修改参数</button>
+                        </td>
+                    </tr>
+                    {% endfor%}
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="box-footer" style="background-color: #d2d6de">
+                <span>just to occupy this place</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+

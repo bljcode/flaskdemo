@@ -1,0 +1,15 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+{% block title %}This is an example page{% endblock %}
+{% block styles %}
+    <link rel="stylesheet"
+          href="static/css/style.css">
+{% endblock %}
+{% block navbar %}
+<div class="navbar">
+  {{nav.top.render()}}
+</div>
+{% endblock %}
+
