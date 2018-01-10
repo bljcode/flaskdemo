@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-solid box-default ">
+                <div class="box-header with-border">
+                    <h3 class="box-title">参数配置</h3>
+                </div>
+
+                <div class="box-body">
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr class="header">
+                            <th>序号</th>
+                            <th>编码</th>
+                            <th>参数</th>
+                            <th>路径</th>
+                            <th>操作</th>
+                        </tr>
+                        {% for arg in args %}
+                            <tr class="ui-state-default">
+                                <td>{{ loop.index }}</td>
+                                <td>{{ arg.mark }}</td>
+                                <td>{{ arg.args }}</td>
+                                <td>{{ arg.url }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-xs btn-success" onclick="go('{{ arg.url }}')">
+                                        执行
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-warning" onclick="edit({{ arg.id }})">修改参数</button>
+                                    <button id="del" type="button" class="btn btn-xs btn-warning"
+                                            onclick="del({{ arg.id }})">删除
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer" style="background-color: #d2d6de">
+                    <div class="col-md-12" id="warning" style="display: none;"><div class="alert alert-success">JSON 数据合法</div></div>
+                    <div class="box-body">
+                        <div class="form-inline" style="margin-left: 45px;padding-top: 10px;">
+                            <span>添加模块：</span>
+                            <label for="" style="margin:5px 3px 3px 3px;"> 编码:</label>
+                            <input id="mark" type="text">
+
+                            <label for="">参数:</label>
+
+                            <div class="input-group">
+                                <textarea id="args" rows="3" cols="30"></textarea>
+
+                            </div>
+                            <button id="add" type="button" class="btn btn-warning btn-primary" onclick="check()">
+                                JSON验证
+                            </button>
+
+                            <label for="">路径:</label>
+
+                            <div class="input-group">
+                                <input id="url" type="text">
+                            </div>
+                            <div class="form-group">
+                                <button id="add" type="button" class="btn btn-success btn-primary" onclick="add()">添加
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+        function go(url) {
+            window.location.href = "" + url;
+        }
+        function edit(id) {
+            window.location.href = "/args/edit/" + id;
+        }
+
+        function check() {
+
+            var content = $("#args").val();
+            console.log("in check,content:" + content)
+            if (content.trim().length == 0) {
+                return false;
+            }
+            try {
+                var jsonStr = content;
+                var json = JSON.parse(jsonStr);
+                $("#warning").html("<div class=\"alert alert-success\">JSON 数据合法</div>").show().delay(5000).fadeOut();
+                return true;
+            } catch (e) {
+                $("#warning").html("<div class=\"alert alert-danger\">JSON 数据错误：" + e + "</div>").show().delay(5000).fadeOut();
+            }
+            return false;
+        }
+
+        function add() {
+            if(!check()){
+                return
+            }
+            var mark = $("#mark").val();
+            var args = $("#args").val();
+            var url = $("#url").val();
+            console.log("in add,mark:" + mark + ",args:" + args + ",url:" + url);
+            if (confirm('确定要添加该模块么?')) {
+                var data = {}
+                data['mark'] = mark;
+                data['args'] = args;
+                data['url'] = url;
+                $.ajax({
+                    type: 'post',
+                    url: '/args/add',
+                    dataType: 'json',
+                    data: data,
+                    success: function (response) {
+                        console.log("in success");
+                        alert("添加成功")
+                        location.reload();
+
+                    },
+                    error: function (response) {
+                        alert("异常")
+                        console.log("in error");
+                    }
+                });
+            } else {
+                return false;
+            }
+
+        }
+
+        function del(id) {
+            console.log("in del,id:" + id)
+            if (confirm('确定要删除该模块么?')) {
+                var data = {}
+                data['id'] = id;
+                $.ajax({
+                    type: 'post',
+                    url: '/args/del',
+                    dataType: 'json',
+                    data: data,
+                    success: function (response) {
+                        console.log("in success");
+                        alert("删除成功")
+                        location.reload();
+                    },
+                    error: function (response) {
+                        alert("异常")
+                        console.log("in error");
+                    }
+                });
+            } else {
+                return false;
+            }
+        }
+
+    </script>
+{% endblock %}
+
+

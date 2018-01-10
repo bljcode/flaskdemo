@@ -4,12 +4,19 @@
 {% import "bootstrap/utils.html" as util %}
 {% block title %}This is an example page{% endblock %}
 {% block styles %}
-    <link rel="stylesheet"
-          href="static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename = 'bootstrap/css/bootstrap.css') }}">
+    <link rel="stylesheet2" href="{{ url_for('static',filename = 'css/base.css') }}">
+    <link rel="font" href="{{ url_for('static',filename = 'bootstrap/css/font-awesome.min.css') }}">
+    <link rel="icon" href="{{ url_for('static',filename = 'bootstrap/css/ionicons.min.css') }}">
 {% endblock %}
 {% block navbar %}
 <div class="navbar">
   {{nav.top.render()}}
 </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static',filename = 'js/jquery/jquery.js') }}"></script>
+    <script src="{{ url_for('static',filename = 'bootstrap/js/bootstrap.js') }}"></script>
+
 {% endblock %}
 

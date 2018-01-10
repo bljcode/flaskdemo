@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12" id="warning" style="display: none;">
+            <div class="alert alert-success">JSON 数据合法</div>
+        </div>
+        <div class="box-body">
+            <div class="form-inline" style="margin-left: 45px;padding-top: 10px;">
+                <span>修改模块：</span>
+                <label for="" style="margin:5px 3px 3px 3px;"> id:</label>
+                <input id="mid" readonly="readonly" type="text" value="{{ arg.id}}">
+                <label for="" style="margin:5px 3px 3px 3px;"> 编码:</label>
+                <input id="mark" type="text" value="{{ arg.mark}}">
+
+                <label for="">参数:</label>
+
+                <div class="input-group">
+                    <textarea id="args" rows="3" cols="30">{{ arg.args}}</textarea>
+
+                </div>
+                <button id="add" type="button" class="btn btn-warning btn-primary" onclick="check()">
+                    JSON验证
+                </button>
+
+                <label for="">路径:</label>
+
+                <div class="input-group">
+                    <input id="url" type="text" value="{{ arg.url}}">
+                </div>
+                <div class="form-group">
+                    <button id="save" type="button" class="btn btn-success btn-primary" onclick="save()">保存
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+
+        function check() {
+
+            var content = $("#args").val();
+            console.log("in check,content:" + content)
+            if (content.trim().length == 0) {
+                return false;
+            }
+            try {
+                var jsonStr = content;
+                var json = JSON.parse(jsonStr);
+                $("#warning").html("<div class=\"alert alert-success\">JSON 数据合法</div>").show().delay(5000).fadeOut();
+                return true;
+            } catch (e) {
+                $("#warning").html("<div class=\"alert alert-danger\">JSON 数据错误：" + e + "</div>").show().delay(5000).fadeOut();
+            }
+            return false;
+        }
+
+        function save() {
+            if(!check()){
+                return;
+            }
+            var id = {{ arg.id }}
+            var mark = $("#mark").val();
+            var args = $("#args").val();
+            var url = $("#url").val();
+            console.log("in add,id:" +id +  ",mark:" + mark + ",args:" + args + ",url:" + url);
+            if (confirm('确定要修改该模块么?')) {
+                var data = {}
+                data['mark'] = mark;
+                data['args'] = args;
+                data['url'] = url;
+                data['id'] = id;
+                $.ajax({
+                    type: 'post',
+                    url: '/args/save',
+                    dataType: 'json',
+                    data: data,
+                    success: function (response) {
+                        console.log("in success");
+                        window.location.href = "/args";
+
+                    },
+                    error: function (response) {
+                        alert("异常")
+                        console.log("in error");
+                    }
+                });
+            } else {
+                return false;
+            }
+
+        }
+    </script>
+{% endblock %}
+
+

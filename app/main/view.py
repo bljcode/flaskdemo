@@ -14,11 +14,11 @@ def hello_world2():
 
 
 
-@main.route('/args', methods=['GET', 'POST'])
-def args():
+@main.route('/home', methods=['GET', 'POST'])
+def home():
     #args = algorithm_args_dao.selectAll()
     list1 = ['Google', 'Runoob', 1997, 2000];
-    return render_template("args.html",args =list1)
+    return render_template("index.html",args =list1)
 
 
 if __name__ == '__main__':
