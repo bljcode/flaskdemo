@@ -26,3 +26,16 @@ def insert(modlename,comment):
 def updateInfo(id,code,info):
     sql = 'UPDATE tablename SET INFO_DATA=CONCAT(INFO_DATA,\'\',\'\\n%s\'),CODE=\'%s\' WHERE ID = %s '%(info,code,id)
     engine.execute(sql)
+
+def selectById(id):
+    sql = 'SELECT * FROM tableName WHERE ID= %s' %(id)
+    return engine.execute(sql)
+    #engine.execute("select * from py_algorithminfo")
+
+
+if __name__ == "__main__":
+    re = selectById(58).fetchone()
+    #不知道哪些属性就打出来看看
+    print(dir(re))
+    for o in re.itervalues():
+        print(o)
