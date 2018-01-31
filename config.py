@@ -17,6 +17,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     #sql url online
+    DEBUG = False
     pass
 
 config = {
