@@ -8,7 +8,7 @@ log = getLogger(__name__)
 
 def saveAppend(src,name,s):
     file_object = open(src + name, 'a+', encoding='utf-8')
-    #file_object = open('com/jd/consumeranalysis/ai/tmpwarehouse/' + name, 'a+', encoding='utf-8')
+    #file_object = open('com/fan/dd/ai/tmp/' + name, 'a+', encoding='utf-8')
     file_object.writelines(s)
 
 def copyFile(src,dst):

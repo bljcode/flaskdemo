@@ -16,12 +16,7 @@ class people:
         self.you = you
 
 if __name__ == '__main__':
-    y = you(5,3)
-    t = people('f',13,y)
-    #自定义对象this must  default=lambda obj: obj.__dict__
-    print(json.dumps(t, default=lambda obj: obj.__dict__))
-    #换行
-    print("this is a " \
-          + "ss")
+    print(1);
+    print(2);
 
 
