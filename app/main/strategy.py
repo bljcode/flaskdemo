@@ -17,6 +17,11 @@ def args():
     return render_template("args/args.html", args =args)
 #两种传参，对应前端两种,通过http请求,看是获取form中参数还是paramter
 #ajax传入form形式，返回json形式，因为前端指定，如果返回json格式错误，就进入前端error形式
+"""
+request.form.get("key", type=str, default=None) 获取表单数据
+request.args.get("key") 获取get请求参数
+request.values.get("key") 获取所有参数
+"""
 @main.route('/args/add', methods=['POST'])
 def addargs():
     mark = request.form.get('mark', '')
