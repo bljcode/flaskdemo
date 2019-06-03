@@ -1,7 +1,8 @@
 import os
 import sys
 import importlib
-
+import time
+from logger import applog
 
 #参考网络上项目的一个根据目录动态加载其中的py文件并可调用对应的实例，来调用约定的方法
 
@@ -30,39 +31,50 @@ class Manager:
         #字典存module
         self.module_list = {}
         #加载
-        self.__load_modules_from_path(abs_module_path)
+        self.add_modules_from_path(abs_module_path)
         #缓存生效
         importlib.invalidate_caches()
 
     #初始化把该路径下所有的py都加入
-    def __load_modules_from_path(self, module_root_path):
+    def add_modules_from_path(self, module_root_path):
         for dir_path, _, files in os.walk(module_root_path):
             for file in files:
                 if file.endswith(".py"):
-                    self.add_module(dir_path,os.path.splitext(file)[0])
+                    try:
+                        self.add_module(dir_path, os.path.splitext(file)[0])
+                    except Exception as err:
+                        applog.error('Got an error ' + str(err),exc_info=True)
+                        #doLog(str(err))
+
 
     #刷新库
     def refresh_modules(self):
-        self.__load_modules_from_path(self.module_dir_path)
+        self.add_modules_from_path(self.module_dir_path)
 
-
-    #添加一个模块,返回该模块
     def add_module(self,dir_path,file_name):
-        #import_path eg: merchant2.module1.m2m1
-        import_path = os.path.join(
-            dir_path.replace(self.module_dir_path, "")[1:],
-            file_name
-        ).replace("/", ".").replace("\\", ".")
-        # for windows is \\
+        """
+        添加一个模块,返回该模块
+        :param dir_path: 'D:\\Python\\JDProject\\bohr\\modules\\merchant1\\module1'
+        :param file_name: 'cdpmodel' or 'cdpmodel.py'
+        :return:
+        """
+        #import_path eg: merchant1.module1.cdpmodel
+        import_path = self.__get_module_path(dir_path,file_name)
+
         cur_module = self.module_list.get(import_path)
         if not cur_module:
             self.__load_module(import_path)
-        elif cur_module and cur_module["mtime"] != os.path.getmtime(self.get_os_path(import_path)):
+        elif cur_module and cur_module["mtime"] != os.path.getmtime(self.__get_os_path(import_path)):
             self.__reload_module(import_path)
         return self.module_list.get(import_path)
 
-    #按import路径返回
+
     def get_module(self,import_path):
+        """
+        按import路径返回
+        :param import_path: 'merchant1.module1.cdpmodel'
+        :return:
+        """
         return self.module_list.get(import_path)
     def __load_module(self, module_path):
         module_class_name = module_path
@@ -76,19 +88,32 @@ class Manager:
         self.module_list[module_path] = {
             "ref": module,
             "instance": module_instance,
-            "mtime": os.path.getmtime(os.path.join(self.get_os_path(module_path)))
+            "mtime": os.path.getmtime(self.__get_os_path(module_path))
         }
         # 调用初始化
         #module_instance.init()
 
 
     def __reload_module(self, module_path):
-        importlib.reload(module_path)
-        self.module_list[module_path]["mtime"] = os.path.getmtime(self.get_os_path( module_path))
+        cur_module = self.module_list.get(module_path)
+        #reload必须传入module类型，原来传入的module_path报错
+        cur_module = importlib.reload(cur_module["ref"])
+        if module_path.count("."):
+            module_class_name = module_path.split(".")[-1]
+        module_class = getattr(cur_module, module_class_name.capitalize())
+        module_instance = module_class()
+
+        self.module_list[module_path] = {
+            "ref": cur_module,
+            "instance": module_instance,
+            "mtime": os.path.getmtime(self.__get_os_path(module_path))
+        }
+        #self.__load_module(module_path)
+        applog.info("reload module_path" + str(module_path))
         importlib.invalidate_caches()
 
 
-    def get_os_path(self, module_path):
+    def __get_os_path(self, module_path):
         module_path = module_path.replace(".", "/")
         module_path += ".py"
 
@@ -96,28 +121,30 @@ class Manager:
 
 
     def remove_module(self, module_path):
-
         module = self.module_list[module_path]["ref"]
-        module.shutdown()
         del module
         del self.module_list[module_path]
 
 
-    def run(self,parameters):
-        for module in self.module_list.values():
-            module["instance"].run(parameters)
 
     #获取module路径
-    def get_module_path(self,os_path):
-        os_path = os_path.replace(self.module_dir_path, "")
-        if os_path[0] == "/":
-            os_path = os_path[1:]
-        os_path = os_path.replace("/", ".")
-        return os.path.splitext(os_path)[0]
+    def __get_module_path(self,dir_path,file_name):
+        dir_path.replace(self.module_dir_path, "")[1:]
+        if file_name.endswith('.py'):
+            file_name = os.path.splitext(file_name)[0]
+        import_path = os.path.join(
+            dir_path.replace(self.module_dir_path, "")[1:],
+            file_name
+        ).replace("/", ".").replace("\\", ".")        # for windows is \\
+
+        return import_path
 
     #获取所有的module
     def get_modules(self):
-        return self.module_list
+        re_list = {}
+        for key in self.module_list.keys():
+            re_list[key] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.module_list[key]['mtime']))
+        return re_list
 
 if __name__ == '__main__':
     work_path = os.path.dirname(__file__) + "/dynamics/"
